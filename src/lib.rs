@@ -20,6 +20,11 @@
 //! tries the older layout (1.27a and before, the default), then the newer.
 //! Reading and writing are exact: `to_bytes` gives back the bytes `parse`
 //! read. The format is described in the README.
+//!
+//! For people, a file has a text form ([`text`]): BNI, one section per
+//! camera, that reads back to the same bytes.
+
+pub mod text;
 
 use parser_rs::bin::{Reader, Writer};
 pub use parser_rs::{BinError, BinResult};

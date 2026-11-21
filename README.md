@@ -3,7 +3,8 @@
 Reader and writer for Warcraft III camera files, `war3map.w3c`: the
 cameras a map's World Editor places (Camera Palette), which the map's
 script names `gg_cam_<name>` (spaces as `_`). A library and a small CLI;
-the [`wc3-mcp`](../wc3-mcp) server's camera tools are built on it.
+the [`wc3-mcp`](../wc3-mcp) server's camera tools and the
+[`wc3-rs`](../wc3-rs) editor are built on it.
 
 Reading and writing are exact: `to_bytes` gives back the bytes `parse`
 read, checked on every map of the game and a corpus of custom maps (207
@@ -69,6 +70,43 @@ std::fs::write("war3map.w3c", file.to_bytes()?)?;
   its `name`; `fields()` gives the numbers in file order with their
   names, `field_mut(name)` one of them.
 - Errors are `parser_rs::BinError`, with the byte offset.
+
+## Text form
+
+For people to read and edit (`text::to_text`, `text::from_text`): BNI, a
+`[w3c]` section, then each camera as a section named after it, its fields
+in file order. The [`wc3-rs`](../wc3-rs) editor opens `.w3c` files this
+way.
+
+```ini
+[w3c]
+version=0
+
+[Close Arthas]
+target_x=-2728.98
+target_y=1922.12
+z_offset=0
+rotation=83.74
+angle_of_attack=330.62
+distance=830.11
+roll=0
+field_of_view=90
+far_z=2500
+near_z=100
+```
+
+- The text doesn't say its layout any more than the file does: it's read
+  in the layout the caller gives, and `local_pitch`, `local_yaw`,
+  `local_roll` are only in the newer one.
+- Numbers are the shortest decimal that reads back as the same `f32`
+  (`-0` stays negative), so the text gives back the exact bytes (the
+  corpus test checks it).
+- A field left out takes World Editor's default; cameras keep their
+  order. A name with `]` or a line break can't be a section header, so
+  such a file has no text form.
+- Errors (`from_text`'s `errors`, with line and column): an unknown or
+  repeated field, a value that isn't a number, a field the layout doesn't
+  have, a version other than 0, anything before `[w3c]`.
 
 ## CLI
 

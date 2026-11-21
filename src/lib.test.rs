@@ -146,6 +146,20 @@ fn corpus() {
             "{}: differs after writing",
             path.display()
         );
+        // And through the text form.
+        let text = text::to_text(&file).unwrap();
+        let back = text::from_text(&text, file.layout);
+        assert!(
+            back.errors.is_empty(),
+            "{}: {:?}",
+            path.display(),
+            back.errors
+        );
+        assert!(
+            back.file.unwrap().to_bytes().unwrap() == bytes,
+            "{}: differs after the text form",
+            path.display()
+        );
         // Without the w3i, the default reading gives the same.
         assert_eq!(parse_any(&bytes).unwrap(), file, "{}", path.display());
         checked += 1;
